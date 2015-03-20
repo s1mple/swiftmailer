@@ -281,25 +281,28 @@ class Swift_Transport_EsmtpTransport extends Swift_Transport_AbstractSmtpTranspo
             return parent::_doHeloCommand();
         }
 
-        if ($this->_params['tls']) {
-            try {
-                $this->executeCommand("STARTTLS\r\n", array(220));
+        // temporary workaround for facebook hhvm's stream tsl issue:
+        // https://github.com/facebook/hhvm/issues/1647
 
-                if (!$this->_buffer->startTLS()) {
-                    throw new Swift_TransportException('Unable to connect with TLS encryption');
-                }
+        // if ($this->_params['tls']) {
+        //     try {
+        //         $this->executeCommand("STARTTLS\r\n", array(220));
 
-                try {
-                    $response = $this->executeCommand(
-                        sprintf("EHLO %s\r\n", $this->_domain), array(250)
-                        );
-                } catch (Swift_TransportException $e) {
-                    return parent::_doHeloCommand();
-                }
-            } catch (Swift_TransportException $e) {
-                $this->_throwException($e);
-            }
-        }
+        //         if (!$this->_buffer->startTLS()) {
+        //             throw new Swift_TransportException('Unable to connect with TLS encryption');
+        //         }
+
+        //         try {
+        //             $response = $this->executeCommand(
+        //                 sprintf("EHLO %s\r\n", $this->_domain), array(250)
+        //                 );
+        //         } catch (Swift_TransportException $e) {
+        //             return parent::_doHeloCommand();
+        //         }
+        //     } catch (Swift_TransportException $e) {
+        //         $this->_throwException($e);
+        //     }
+        // }
 
         $this->_capabilities = $this->_getCapabilities($response);
         $this->_setHandlerParams();
